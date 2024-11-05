@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=questiondb'
+      - 'POSTGRES_PASSWORD=123'
+      - 'POSTGRES_USER=admin'
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/questiondb
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: 123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      - postgres
+    ports:
+      - '8080:8080'
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge
