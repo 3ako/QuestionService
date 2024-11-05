@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.zako.questionservice.api.auth.JwtAuthenticationFilter;
 import ru.zako.questionservice.user.UserArgumentResolver;
@@ -35,15 +36,18 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println("Configuring SecurityFilterChain..."); // Для проверки
+        http.authorizeHttpRequests(auth -> auth
 
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login").permitAll()// Разрешить доступ к эндпоинту регистрации
+                        .requestMatchers("/register", "/login",
+                                "/swagger-ui/**",
+                                "/api-docs/**",
+                                "/api-docs.yaml")
+                        .permitAll()
+
                         .requestMatchers("/test").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .userDetailsService(userService)
+//                .userDetailsService(userService)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable);
         return http.build();

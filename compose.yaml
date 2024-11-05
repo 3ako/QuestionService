@@ -26,6 +26,8 @@ services:
       - '8080:8080'
     networks:
       - app-network
+    command: ["./wait-for-postgres.sh", "postgres", "java", "-jar", "app.jar"]
+
 
 
 networks:

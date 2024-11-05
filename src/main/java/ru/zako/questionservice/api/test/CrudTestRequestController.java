@@ -1,17 +1,18 @@
 package ru.zako.questionservice.api.test;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.zako.questionservice.api.ApiResponse;
+import ru.zako.questionservice.api.AbstractApiResponse;
 import ru.zako.questionservice.api.test.request.CreateTestRequest;
-import ru.zako.questionservice.api.test.request.DeleteTestRequest;
 import ru.zako.questionservice.api.test.request.EditTestRequest;
 import ru.zako.questionservice.question.test.Test;
 import ru.zako.questionservice.question.test.TestDTO;
@@ -43,20 +44,33 @@ public class CrudTestRequestController {
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<ApiResponse<?>> edit(@AuthenticationPrincipal User user, @RequestBody EditTestRequest request) {
+    @Operation(summary = "Редактировать тест", description = "Редактирует существующий тест, если пользователь является его создателем.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Тест успешно отредактирован"),
+            @ApiResponse(responseCode = "400", description = "Некорректный ID или тест не найден"),
+            @ApiResponse(responseCode = "403", description = "Нет разрешения на редактирование теста")
+    })
+    @Parameter(name = "Authorization", description = "Токен доступа", in = ParameterIn.HEADER, required = true)
+    public ResponseEntity<AbstractApiResponse<?>> edit(@AuthenticationPrincipal User user, @RequestBody EditTestRequest request) {
         Test test = validateTestOwnership(user, request.id());
 
         test.setTitle(request.title());
         test.setAmountQuestions(request.amountQuestions());
         testService.save(test);
 
-        return ResponseEntity.ok(new ApiResponse<>(true, null));
+        return ResponseEntity.ok(new AbstractApiResponse<>(true, null));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<?>> create(@AuthenticationPrincipal User user, @RequestBody CreateTestRequest request) {
+    @Operation(summary = "Создать тест", description = "Создает новый тест от имени текущего пользователя.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Тест успешно создан"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные")
+    })
+    @Parameter(name = "Authorization", description = "Токен доступа", in = ParameterIn.HEADER, required = true)
+    public ResponseEntity<AbstractApiResponse<?>> create(@AuthenticationPrincipal User user, @RequestBody CreateTestRequest request) {
         if (request.title() == null || request.amountQuestions() <= 0) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Invalid data"));
+            return ResponseEntity.badRequest().body(new AbstractApiResponse<>(false, "Invalid data"));
         }
         final Test test = new Test();
         test.setTitle(request.title());
@@ -65,14 +79,21 @@ public class CrudTestRequestController {
         test.setCreateDate(new Date());
 
         testService.save(test);
-        return ResponseEntity.ok(new ApiResponse<>(true, null, new TestDTO(test)));
+        return ResponseEntity.ok(new AbstractApiResponse<>(true, null, new TestDTO(test)));
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity<ApiResponse<?>> delete(@AuthenticationPrincipal User user, @RequestBody DeleteTestRequest request) {
-        Test test = validateTestOwnership(user, request.id());
+    @DeleteMapping("/delete")
+    @Operation(summary = "Удалить тест", description = "Удаляет тест, если пользователь является его создателем.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Тест успешно удален"),
+            @ApiResponse(responseCode = "400", description = "Некорректный ID или тест не найден"),
+            @ApiResponse(responseCode = "403", description = "Нет разрешения на удаление теста")
+    })
+    @Parameter(name = "Authorization", description = "Токен доступа", in = ParameterIn.HEADER, required = true)
+    public ResponseEntity<AbstractApiResponse<?>> delete(@AuthenticationPrincipal User user, long id) {
+        Test test = validateTestOwnership(user, id);
         testService.delete(test.getId());
 
-        return ResponseEntity.ok(new ApiResponse<>(true, null));
+        return ResponseEntity.ok(new AbstractApiResponse<>(true, null));
     }
 }

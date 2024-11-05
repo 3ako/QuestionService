@@ -10,7 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, "Invalid request body"));
+    public ResponseEntity<AbstractApiResponse<?>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AbstractApiResponse<>(false, "Invalid request body"));
     }
 }
