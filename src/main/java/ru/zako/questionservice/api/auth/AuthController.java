@@ -1,7 +1,6 @@
 package ru.zako.questionservice.api.auth;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,12 +12,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.zako.questionservice.api.AbstractApiResponse;
 import ru.zako.questionservice.api.auth.request.AuthRequest;
+import ru.zako.questionservice.user.ProfileDto;
 import ru.zako.questionservice.user.User;
 import ru.zako.questionservice.user.UserService;
 import ru.zako.questionservice.util.JwtUtil;
@@ -46,6 +48,12 @@ public class AuthController {
                             schema = @Schema(implementation = AbstractApiResponse.class) // Указание класса ответа
                     ))
     })
+
+    @GetMapping("/profile")
+    public ResponseEntity<AbstractApiResponse<ProfileDto>> profile(@AuthenticationPrincipal User user) {
+        return new ResponseEntity<>(new AbstractApiResponse<>(true, null, new ProfileDto(user)), HttpStatus.OK);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AbstractApiResponse<?>> authenticate(
             @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Данные для аутентификации") AuthRequest authRequest) {

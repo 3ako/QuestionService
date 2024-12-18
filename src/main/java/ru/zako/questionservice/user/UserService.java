@@ -37,13 +37,13 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserDetails loadUserById(long id) throws UsernameNotFoundException {
-        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found: "+ id));
         return new ru.zako.questionservice.user.UserDetails(id, user.getUsername(), user.getPassword(), getAuthority(user));
     }
 
     @Override @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found "+ username));
         return new ru.zako.questionservice.user.UserDetails(user.getId(), user.getUsername(), user.getPassword(), getAuthority(user));
     }
 

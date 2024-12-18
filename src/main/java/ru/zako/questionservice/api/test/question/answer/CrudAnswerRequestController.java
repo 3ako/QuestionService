@@ -66,7 +66,7 @@ public class CrudAnswerRequestController {
     })
     @Parameter(name = "Authorization", description = "Токен доступа", in = ParameterIn.HEADER, required = true)
     public ResponseEntity<AbstractApiResponse<?>> create(@AuthenticationPrincipal User user,
-                                                         @ModelAttribute CreateAnswerRequest request) {
+                                                         @RequestBody CreateAnswerRequest request) {
         final Question question = questionService.findById(request.questionId());
         if (question == null) {
             return new ResponseEntity<>(new AbstractApiResponse<>(false, "Question not found"), HttpStatus.NOT_FOUND);

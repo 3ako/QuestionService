@@ -1,6 +1,5 @@
 package ru.zako.questionservice.question.test;
 
-import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -16,6 +15,10 @@ public class TestService {
 
     public List<Test> getUserCreatedTests(long creatorId) {
         return testRepository.findAllByCreator(creatorId);
+    }
+
+    public List<Test> getAllByUser(long userId) {
+        return testRepository.findAllByCreator(userId);
     }
 
     @Transactional

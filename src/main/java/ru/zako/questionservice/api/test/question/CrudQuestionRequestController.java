@@ -42,6 +42,8 @@ public class CrudQuestionRequestController {
     @Parameter(name = "Authorization", description = "Токен доступа", in = ParameterIn.HEADER, required = true)
     public ResponseEntity<AbstractApiResponse<?>> getAll(@AuthenticationPrincipal User user,
                                                          @RequestParam long testId) {
+
+        System.out.println("Test: "+ testId);
         final Test test = testService.getById(testId);
         if (test == null) {
             return new ResponseEntity<>(new AbstractApiResponse<>(false, "Test not found"), HttpStatus.NOT_FOUND);
@@ -90,8 +92,9 @@ public class CrudQuestionRequestController {
     })
     @Parameter(name = "Authorization", description = "Токен доступа", in = ParameterIn.HEADER, required = true)
     public ResponseEntity<AbstractApiResponse<?>> create(@AuthenticationPrincipal User user,
-                                                         @ModelAttribute CreateQuestionRequest request) {
+                                                         @RequestBody CreateQuestionRequest request) {
 
+        System.out.println("REQ: "+request);
         if (request.testId() < 0 || request.text() == null || request.maxTry() <= 0) {
             return ResponseEntity.badRequest().body(new AbstractApiResponse<>(false, "Invalid data"));
         }

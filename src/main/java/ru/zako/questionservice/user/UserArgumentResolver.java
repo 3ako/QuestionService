@@ -30,7 +30,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails ud) {
             return userRepository.findById(ud.getId())
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: "+ ud.getId()));
         }
         return null;
     }

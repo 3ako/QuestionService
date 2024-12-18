@@ -43,8 +43,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 "/api-docs/**",
                                 "/api-docs.yaml")
                         .permitAll()
+                        .requestMatchers("/error").permitAll()
 
-                        .requestMatchers("/test").hasRole("USER")
+//                        .requestMatchers("/test").hasRole("USER")
+//                        .requestMatchers("/profile").hasRole("USER")
                         .anyRequest().authenticated()
                 )
 //                .userDetailsService(userService)

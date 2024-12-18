@@ -20,6 +20,7 @@ import ru.zako.questionservice.question.test.TestService;
 import ru.zako.questionservice.user.User;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -41,6 +42,23 @@ public class CrudTestRequestController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No permissions");
         }
         return test;
+    }
+
+    @GetMapping("/getall")
+    @Operation(summary = "Редактировать тест", description = "Получает все тесты, которые создавались пользователем.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успех"),
+            @ApiResponse(responseCode = "403", description = "Нет разрешения")
+    })
+    @Parameter(name = "Authorization", description = "Токен доступа", in = ParameterIn.HEADER, required = true)
+    public ResponseEntity<AbstractApiResponse<?>> getall(@AuthenticationPrincipal User user) {
+
+        List<TestDTO> tests = testService.getAllByUser(user.getId())
+                .stream()
+                .map(TestDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(new AbstractApiResponse<>(true, null, tests));
     }
 
     @PostMapping("/edit")

@@ -1,5 +1,8 @@
 package ru.zako.questionservice.question.answer;
 
+import lombok.Data;
+
+@Data
 public class AnswerDTO {
     private long id;
     private long questionId;
